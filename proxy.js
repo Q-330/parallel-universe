@@ -44,8 +44,8 @@ const server = http.createServer((req, res) => {
     try {
       const payload = JSON.parse(body);
 
-      // 注入API Key和默认model
-      if (!payload.model) payload.model = 'deepseek-chat';
+      // 注入API Key和默认model（v2.5：默认启用deepseek-reasoner深度思考）
+      if (!payload.model) payload.model = 'deepseek-reasoner';
 
       const postData = JSON.stringify(payload);
       const options = {

@@ -59,7 +59,7 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const payload = JSON.parse(body);
-        if (!payload.model) payload.model = 'deepseek-chat';
+        if (!payload.model) payload.model = 'deepseek-reasoner';
 
         const postData = JSON.stringify(payload);
         const options = {
