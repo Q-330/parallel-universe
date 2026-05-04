@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>平行宇宙推演器 v2.0 | Parallel Universe Diviner</title>
+<title>平行宇宙推演器 v2.2 | Parallel Universe Diviner</title>
 <style>
 /* ========== CSS Variables ========== */
 :root {
@@ -680,6 +680,23 @@ select.form-input {
 .universe-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 10px 0; }
 .universe-tab { padding: 8px 12px; border-radius: 20px; font-size: 13px; background: rgba(255,255,255,0.05); color: #8892B0; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
 .universe-tab:hover { background: rgba(255,255,255,0.1); }
+
+/* === v2.2: Comic Panels with Dialogue === */
+.comic-section { margin: 20px 0 10px; }
+.comic-title { color: #8892B0; font-size: 14px; margin-bottom: 12px; text-align: center; }
+.comic-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.comic-panel { background: rgba(17,24,39,0.9); border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px; position: relative; transition: transform 0.2s ease, border-color 0.2s ease; }
+.comic-panel:hover { transform: translateY(-2px); border-color: rgba(0,212,255,0.3); }
+.panel-num { position: absolute; top: -8px; left: 12px; background: linear-gradient(135deg, #00D4FF, #7B61FF); color: #000; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+.panel-scene { color: #C8CDE0; font-size: 12px; line-height: 1.5; margin-top: 8px; min-height: 36px; padding: 6px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 2px solid rgba(0,212,255,0.3); }
+.panel-dialogue { margin-top: 8px; }
+.dlg-line { display: flex; gap: 6px; margin-bottom: 4px; font-size: 12px; line-height: 1.4; align-items: baseline; }
+.dlg-name { color: #FF6B35; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.dlg-name::before { content: '「'; }
+.dlg-name::after { content: '」'; }
+.dlg-text { color: #E8EAF6; }
+.dlg-text::before { content: ': '; color: #6B7394; }
+.panel-narrator { color: #7B61FF; font-size: 11px; font-style: italic; margin-top: 6px; padding-top: 4px; border-top: 1px dashed rgba(123,97,255,0.2); }
 
 </style>
 </head>
@@ -1762,16 +1779,23 @@ async function startDivination() {
 ## 选择题答案（反映性格倾向和人生选择偏好）
 ${answersText}
 
-## 推演要求：
+  ## 推演要求：
 请生成 5-8 个完全不同的平行宇宙。每个宇宙的用户版本在身份、物种、性别、性格、命运走向上完全随机，探索一切可能性。不要受现实逻辑约束，越有创意越好。
 
+[随机扰动因子：RDM-REPLACE_SEED]
+请根据这个种子，调整宇宙的人设、物种、剧情走向，让不同宇宙明显不同。
+
 请严格按照JSON格式输出推演结果。`;
+
+  // v2.2：动态生成随机扰动因子，替换占位符
+    const randomSeed = 'RDM-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6);
+    const userPromptFinal = userPrompt.replace('RDM-REPLACE_SEED', randomSeed);
 
   try {
     const data = await callLLM(
       [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
+        { role: 'user', content: userPromptFinal }
       ],
       { temperature: 0.85, max_tokens: 4000 }
     );
@@ -1913,6 +1937,25 @@ function renderResult(data) {
               <div class="meme-emoji">${u.emoji||'😶'}</div>
               ${u.meme_desc ? `<div class="meme-desc">${escapeHtml(u.meme_desc)}</div>` : ''}
             </div>
+            ${u.comic_panels && u.comic_panels.length > 0 ? `
+            <div class="comic-section">
+              <div class="comic-title">📋 这个宇宙的漫画故事</div>
+              <div class="comic-panels">
+                ${u.comic_panels.map(p => {
+                  const dlg = (p.dialogue||'').split('\\n').filter(l => l.trim()).map(line => {
+                    const m = line.match(/「([^：]+)：(.+)」/) || line.match(/"([^"]+)":(.+)/) || line.match(/(.+?)[:：](.+)/);
+                    if (m) return '<div class="dlg-line"><span class="dlg-name">' + escapeHtml(m[1].trim()) + '</span><span class="dlg-text">' + escapeHtml(m[2].trim()) + '</span></div>';
+                    return '<div class="dlg-line"><span class="dlg-text">' + escapeHtml(line.trim()) + '</span></div>';
+                  }).join('');
+                  return '<div class="comic-panel">' +
+                    '<div class="panel-num">第' + (p.panel||'') + '格</div>' +
+                    '<div class="panel-scene">' + escapeHtml(p.scene||'') + '</div>' +
+                    '<div class="panel-dialogue">' + dlg + '</div>' +
+                    (p.narrator ? '<div class="panel-narrator">📢 ' + escapeHtml(p.narrator) + '</div>' : '') +
+                    '</div>';
+                }).join('')}
+              </div>
+            </div>` : ''}
           </div>
         </div>
       </div>`;
