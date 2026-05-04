@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>平行宇宙推演器 v2.2 | Parallel Universe Diviner</title>
+<title>平行宇宙推演器 v2.3 | Parallel Universe Diviner</title>
 <style>
 /* ========== CSS Variables ========== */
 :root {
@@ -1770,32 +1770,39 @@ async function startDivination() {
     birthPlaceLine = `\n- 出生地：${place}`;
   }
 
+  // v2.3：随机种子只给 random 宇宙用，常驻宇宙基于用户真实信息
+  const randomSeed = 'RDM-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6);
+
   const userPrompt = `## 用户信息
 - 姓名：${state.userName}
 - 性别：${state.userGender}
 - 出生日期：${state.userBirthDate}
-- 推演时间跨度：${state.userYears}年后${occupationLine}
+- 推演时间跨度：${state.userYears}年后${occupationLine}${birthPlaceLine}
 
 ## 选择题答案（反映性格倾向和人生选择偏好）
 ${answersText}
 
-  ## 推演要求：
-请生成 5-8 个完全不同的平行宇宙。每个宇宙的用户版本在身份、物种、性别、性格、命运走向上完全随机，探索一切可能性。不要受现实逻辑约束，越有创意越好。
+## 推演要求：
 
-[随机扰动因子：RDM-REPLACE_SEED]
-请根据这个种子，调整宇宙的人设、物种、剧情走向，让不同宇宙明显不同。
+### 常驻宇宙（main / potential / warning）—— 围绕用户真实信息推演
+这3个宇宙是核心，必须深度绑定用户真实信息进行命运推演：
+- 必须是用户本人（人类，真实性别），从八字推算的性格特质、出生背景、职业、性格倾向出发
+- main：顺应用户现有轨迹，推演"如果做不同选择会怎样"的真实人生走向
+- potential：放大用户被压抑的潜力特质，推演"如果走了另一条路"的反转人生
+- warning：基于八字推算的潜在风险点+性格弱点，推演需要注意的人生警示
+- 三者的职业方向、生活场景、精神状态必须明显不同，禁止雷同
+
+### 随机宇宙（random）—— 天马行空
+- 物种/性别/身份完全随机，不按常理出牌
+- 随机扰动因子：${randomSeed}（根据此种子产出独特的随机宇宙）
 
 请严格按照JSON格式输出推演结果。`;
-
-  // v2.2：动态生成随机扰动因子，替换占位符
-    const randomSeed = 'RDM-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 6);
-    const userPromptFinal = userPrompt.replace('RDM-REPLACE_SEED', randomSeed);
 
   try {
     const data = await callLLM(
       [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPromptFinal }
+        { role: 'user', content: userPrompt }
       ],
       { temperature: 0.85, max_tokens: 4000 }
     );
