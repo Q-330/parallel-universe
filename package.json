@@ -1,0 +1,14 @@
+{
+  "name": "parallel-universe",
+  "version": "1.0.0",
+  "description": "平行宇宙推演器 - AI驱动的平行人生探索工具",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "license": "MIT"
+}
