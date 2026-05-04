@@ -69,7 +69,7 @@ const server = http.createServer((req, res) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
             'Content-Length': Buffer.byteLength(postData)
           }
         };
