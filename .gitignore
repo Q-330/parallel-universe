@@ -5,3 +5,7 @@ node_modules/
 *.md
 !README.md
 !DEPLOY_GUIDE.md
+
+# 开发专用（含硬编码API Key，不可推送）
+proxy.js
+nul

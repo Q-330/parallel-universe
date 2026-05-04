@@ -1766,18 +1766,54 @@ ${answersText}
 
     clearInterval(statusInterval);
 
-    const content = data.choices[0].message.content;
+    const rawContent = data.choices[0].message.content;
 
-    let result;
+    // v2.7：deepseek-reasoner 可能在 content 中包含 <think...</think 标签，需要剥离
+    let content = rawContent.replace(/<think[\s\S]*?<\/think>/gi, '').trim();
+
+    // v2.7：尝试多种方式提取 JSON
+    let result = null;
+
+    // 方式1：直接解析
     try {
       result = JSON.parse(content);
     } catch (e) {
+      // 方式2：用正则找 JSON 对象
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        result = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('AI返回的数据格式异常，请重试');
+        try {
+          result = JSON.parse(jsonMatch[0]);
+        } catch (e2) {
+          console.warn('[解析] 正则提取的JSON仍无法解析，尝试修复...');
+          // 方式3：尝试找到第一个 { 和最后一个 } 之间的内容
+          const firstBrace = content.indexOf('{');
+          const lastBrace = content.lastIndexOf('}');
+          if (firstBrace !== -1 && lastBrace > firstBrace) {
+            try {
+              result = JSON.parse(content.substring(firstBrace, lastBrace + 1));
+            } catch (e3) {
+              console.error('[解析] JSON解析最终失败', e3);
+              console.error('[解析] 原始content前500字:', content.substring(0, 500));
+              console.error('[解析] 原始content末200字:', content.substring(content.length - 200));
+            }
+          }
+        }
       }
+    }
+
+    // v2.7：如果所有解析方式都失败，记录详细信息方便排查
+    if (!result) {
+      console.error('[解析] AI返回内容解析失败！');
+      console.error('[解析] reasoning_content长度:', (data.choices[0].message.reasoning_content || '').length);
+      console.error('[解析] content长度:', rawContent.length);
+      console.error('[解析] content前500字:', rawContent.substring(0, 500));
+      throw new Error('AI返回的数据格式异常，请重试');
+    }
+
+    // v2.7：校验结果结构
+    if (!result.universes || !Array.isArray(result.universes) || result.universes.length === 0) {
+      console.error('[解析] JSON结构缺少universes数组:', JSON.stringify(result).substring(0, 300));
+      throw new Error('AI返回的数据缺少宇宙信息，请重试');
     }
 
     state.resultData = result;
