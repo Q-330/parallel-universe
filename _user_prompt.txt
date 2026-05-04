@@ -1,0 +1,14 @@
+## 用户信息
+- 姓名：${state.userName}
+- 性别：${state.userGender}
+- 出生日期：${state.userBirthDate}
+- 出生时间：${state.userBirthTime}
+- 推演时间跨度：${state.userYears}年后${occupationLine}${birthPlaceLine}
+
+## 选择题答案（反映性格倾向和人生选择偏好）
+${answersText}
+
+## 推演要求：
+请生成 5-8 个完全不同的平行宇宙。每个宇宙的用户版本在身份、物种、性别、性格、命运走向上完全随机，探索一切可能性。不要受现实逻辑约束，越有创意越好。
+
+请严格按照JSON格式输出推演结果。
