@@ -687,7 +687,7 @@ select.form-input {
       输入你的生辰八字，回答10道命运选择题<br>
       AI将为你推演多个平行宇宙中，不同选择的你
     </p>
-    <p class="landing-tagline">基于八字命理 × 心理分析 × AI大模型推演</p>
+    <p class="landing-tagline">平行宇宙推演 × 心理分析 × AI大模型</p>
     <button class="btn btn-primary" onclick="goToPage('form')">开启推演 →</button>
   </div>
 </div>
@@ -697,7 +697,7 @@ select.form-input {
   <div class="container">
     <div class="form-card">
       <div class="form-title">📅 命运档案</div>
-      <div class="form-desc">请填写你的基本信息，用于八字排盘</div>
+      <div class="form-desc">请填写你的基本信息，开始平行宇宙推演</div>
 
       <div class="form-group">
         <label class="form-label">👤 你的名字</label>
@@ -723,7 +723,7 @@ select.form-input {
             </select>
           </div>
         </div>
-        <div style="font-size:0.75rem;color:var(--text-dim);margin-top:6px;">出生地影响真太阳时计算，让八字排盘更精准</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);margin-top:6px;">出生地用于个性化推演（可选）</div>
       </div>
 
       <div class="form-group">
@@ -1667,58 +1667,63 @@ async function startDivination() {
     `第${i + 1}题（${a.question.dimension}）：${a.trait}`
   ).join('\n');
 
-  const systemPrompt = `你是「平行宇宙推演师」，一位融合了八字命理、现代心理学、平行宇宙理论的AI推演大师。
+  const systemPrompt = `你是「平行宇宙推演师」，一位融合心理学、性格分析、平行宇宙理论的AI推演大师。
 
-你的任务：根据用户提供的生辰八字和10道命运选择题的答案，推演出3个平行宇宙版本的用户。
+你的任务：根据用户的基本信息和10道命运选择题的答案，推演出多个平行宇宙版本的用户。
+每个宇宙的人设、物种、性别、性格、身份完全随机，探索一切可能性。
 
 ## 输出格式（严格JSON）：
 {
   "universes": [
     {
-      "id": "A",
-      "name": "主宇宙",
-      "subtitle": "最可能出现的你",
+      "id": "1",
+      "name": "（宇宙名称，要有创意，如：量子猫咪宇宙、深海诗人宇宙、赛博和尚宇宙、蒲公英自由者宇宙）",
+      "subtitle": "（副标题，8-15字，概括这个宇宙的核心气质）",
       "score": 85,
       "dimensions": {"事业":90,"感情":78,"财富":85,"健康":82,"精神":88},
-      "report": "（500-800字详细推演报告，涵盖事业/感情/财富/健康/精神五个维度，描述${state.userYears}年后的生活状态）",
-      "quote": "（一句来自「未来的你」的话，温暖而有力，20-40字）"
-    },
-    {
-      "id": "B",
-      "name": "潜力宇宙",
-      "subtitle": "隐藏潜能的完全释放版",
-      "score": 78,
-      "dimensions": {"事业":95,"感情":72,"财富":90,"健康":68,"精神":85},
-      "report": "（500-800字，如果做出某些关键选择的不同决定，天赋完全释放的版本，更大胆但更冒险）",
-      "quote": "（一句鼓励的话，关于勇敢突破）"
-    },
-    {
-      "id": "C",
-      "name": "警示宇宙",
-      "subtitle": "需要警惕的暗面",
-      "score": 52,
-      "dimensions": {"事业":60,"感情":55,"财富":48,"健康":50,"精神":45},
-      "report": "（500-800字，如果持续走某些不利路径的后果，温和警示而非恐吓，帮助用户识别需要改变的方向）",
-      "quote": "（一句引人深思的话，关于反思和改变）"
+      "report": "（500-800字详细推演报告，生动具体有画面感，描述这个宇宙中「你」${state.userYears}年后的生活状态、在做什么、精神状态）",
+      "quote": "（一句来自这个宇宙中的「你」的话，20-40字，语气完全符合其人设）",
+      "message": "（这个宇宙中的「你」对用户（现实世界的人）说的一句话，20-60字。真实还原人设，不讨好。如果这个宇宙的你是个冷漠的人，留言就是冷漠的；如果是热情的，就是热情的）",
+      "emoji": "（3-5个emoji组合，表达这个宇宙的情绪氛围，如：😎🔥🚀 或 🥀🌧️📖）",
+      "meme_desc": "（梗图文字描述，适配这个人设，10-20字，如：「当我终于学会了放下」「今天也在假装正常人」）",
+      "species": "（物种，完全随机：人类/猫/树/AI/外星人/水母/机器人/云/其他想象得到的）",
+      "gender": "（性别，完全随机：男/女/非二元/无性别/流动/其他）",
+      "personality": "（性格标签，2-4个词，如：冷漠天才 / 热情冒险家 / 抑郁哲学家 / 佛系观察者）",
+      "current": "（这个宇宙中的「你」现在在干嘛，一句话描述，15-30字）",
+      "future": "（这个宇宙中的「你」以后打算干嘛，一句话描述，15-30字）"
     }
+    // 总共生成 5-8 个宇宙，每个完全不同
   ]
 }
 
+## 人设要求（非常重要）：
+- 性格全随机：可能冷漠、傲慢、温柔、暴力、佛系、疯狂、理性、感性、神经质等
+- 物种全随机：不限于人类，可以是任何想象得到的存在
+- 性别全随机：不限定，探索所有可能性
+- 身份全随机：富豪/乞丐/哲学家/网红/隐士/外星探险家/一棵会思考的树等
+- message 必须真实还原人设，不讨好用户：
+  · 如果这个宇宙的你是冷漠性格，留言就是冷漠的（如："别来找我。"）
+  · 如果是傲娇性格，就是傲娇的（如："才、才不是特意为你推演的呢！"）
+  · 如果是哲学家性格，就是哲学的（如："你问我在干嘛？我在观察一片叶子的掉落。"）
+  · 如果是暴力性格，就是直接的（如："很好，继续活着吧。"）
+
 ## 语气要求：
-- 神秘但温暖，像来自未来的朋友在跟你聊天
-- 描述具体生动，有画面感，不要空洞的套话
-- 适度提及八字中的五行/十神概念作为分析依据
+- 有画面感，像描述一个真实存在的平行世界
+- 描述具体生动，有细节，不要空洞的套话
 - 每个宇宙的特色要明显区分，不要雷同
-- 禁止：恐吓、封建迷信、绝对化表述（如"一定会""100%"）
-- 禁止：声称可以预测未来，要强调这是「基于趋势的推演」
+- 禁止：提及八字/五行/命理/算命等概念
+- 禁止：夸大、让人听不懂的词汇
+- 禁止：恐吓、绝对化表述
+- 强调：这是「基于选择和性格推演的平行宇宙」，不是算命
 
 ## 重要：
 - 必须返回纯JSON，不要有其他任何文字
+- 生成 5-8 个宇宙，名称要有创意，探索一切可能
 - score范围：40-98
 - dimensions各项范围：30-98
-- report要生动具体，不要泛泛而谈`;
+- report要生动具体，有画面感和故事感
+- current 和 future 要具体，体现这个宇宙的"你"在做什么`;
 
-  const wuXingMap = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
 
   let occupationLine = '';
   if (state.userOccupation) {
@@ -1737,18 +1742,15 @@ async function startDivination() {
 - 姓名：${state.userName}
 - 性别：${state.userGender}
 - 出生日期：${state.userBirthDate}
-- 出生时间：${state.userBirthTime}${birthPlaceLine}
 - 推演时间跨度：${state.userYears}年后${occupationLine}
 
-## 八字排盘
-- 四柱：${state.bazi.full}
-- 日主：${state.bazi.dayMaster}（${wuXingMap[state.bazi.dayMaster] || '水'}属）
-- 五行分布：${state.bazi.wuxing}
-
-## 选择题答案
+## 选择题答案（反映性格倾向和人生选择偏好）
 ${answersText}
 
-请严格按照JSON格式推演${state.userYears}年后的3个平行宇宙版本。`;
+## 推演要求：
+请生成 5-8 个完全不同的平行宇宙。每个宇宙的用户版本在身份、物种、性别、性格、命运走向上完全随机，探索一切可能性。不要受现实逻辑约束，越有创意越好。
+
+请严格按照JSON格式输出推演结果。`;
 
   try {
     const data = await callLLM(
@@ -1790,32 +1792,62 @@ ${answersText}
 // ========== Result Rendering ==========
 function renderResult(data) {
   document.getElementById('resultName').textContent = `${state.userName} 的平行宇宙`;
-  document.getElementById('resultBazi').textContent = state.bazi.full + ' · ' + state.bazi.wuxing;
+  // 不再显示八字信息
+  document.getElementById('resultBazi').textContent = `平行宇宙推演 · ${state.userYears}年后的${state.userGender}生`;
+
+  // 从所有宇宙中随机抽选3个
+  const allUniverses = data.universes;
+  const selected = [];
+  const pool = [...allUniverses];
+  while (selected.length < 3 && pool.length > 0) {
+    const idx = Math.floor(Math.random() * pool.length);
+    selected.push(pool.splice(idx, 1)[0]);
+  }
+  // 如果不足3个，用现有的凑
+  while (selected.length < 3 && allUniverses.length > 0) {
+    const u = allUniverses[Math.floor(Math.random() * allUniverses.length)];
+    if (!selected.includes(u)) selected.push(u);
+  }
 
   const colors = ['a', 'b', 'c'];
   const colorMap = { a: { border: 'universe-a', cls: 'active-a' }, b: { border: 'universe-b', cls: 'active-b' }, c: { border: 'universe-c', cls: 'active-c' } };
-  const dimIcons = { '事业': '💼', '感情': '❤️', '财富': '💰', '健康': '🏃', '精神': '🧠' };
+  const dimIcons = { '事业': '💼', '感情': '❤️', '财富': '💰', '健康': '🏥', '精神': '🧠' };
 
+  // 生成 Tabs HTML（动态，基于随机选中的宇宙）
+  let tabsHTML = '';
+  selected.forEach((u, i) => {
+    const cls = i === 0 ? colorMap[colors[i]].cls : '';
+    const emoji = u.emoji ? u.emoji.split(' ')[0] : '🌌';
+    tabsHTML += `<button class="universe-tab ${cls}" onclick="switchUniverse(${i})">${emoji} ${u.name}</button>`;
+  });
+  document.getElementById('universeTabs').innerHTML = tabsHTML;
+
+  // 生成 Panels HTML
   let panelsHTML = '';
-  data.universes.forEach((u, i) => {
+  selected.forEach((u, i) => {
     const cls = colorMap[colors[i]];
     const dimBars = Object.entries(u.dimensions).map(([name, val]) => `
       <div class="dim-item">
         <span class="dim-icon">${dimIcons[name] || '📊'}</span>
         <span class="dim-name">${name}</span>
         <div class="dim-bar-track">
-          <div class="dim-bar-fill" style="width: ${val}%" data-width="${val}"></div>
+          <div class="dim-bar-fill" style="width: 0%" data-width="${val}"></div>
         </div>
         <span class="dim-value">${val}</span>
       </div>
     `).join('');
 
+    const speciesBadge = u.species ? `<span class="species-tag">${u.species}</span>` : '';
+    const genderBadge = u.gender ? `<span class="gender-tag">${u.gender}</span>` : '';
+    const personalityBadge = u.personality ? `<span class="personality-tag">${u.personality}</span>` : '';
+
     panelsHTML += `
       <div class="universe-panel ${i === 0 ? 'active' : ''}" data-universe="${i}">
         <div class="container">
           <div class="universe-card ${cls.border}">
-            <span class="universe-label">${u.id === 'A' ? '🌌' : u.id === 'B' ? '💫' : '⚡'} ${u.name}</span>
-            <div class="universe-title">${u.subtitle}</div>
+            <span class="universe-label">${speciesBadge} ${genderBadge} ${personalityBadge}</span>
+            <div class="universe-title">${u.name}</div>
+            <div class="universe-subtitle">${u.subtitle || ''}</div>
             <div class="universe-desc">${state.userYears}年后的平行宇宙版本</div>
 
             <div class="score-total">
@@ -1830,7 +1862,26 @@ function renderResult(data) {
               <div class="report-text">${u.report}</div>
             </div>
 
+            ${u.current ? `<div class="current-future"><span class="cf-label">📍 现在在干嘛：</span>${u.current}</div>` : ''}
+            ${u.future ? `<div class="current-future"><span class="cf-label">🔮 以后打算：</span>${u.future}</div>` : ''}
+
             <div class="report-quote">${u.quote}</div>
+
+            <!-- 留言气泡 -->
+            ${u.message ? `
+            <div class="message-section">
+              <div class="message-title">💬 这个宇宙中的「你」对我说：</div>
+              <div class="message-bubble ${i === 0 ? 'bubble-a' : i === 1 ? 'bubble-b' : 'bubble-c'}">
+                ${u.message}
+              </div>
+            </div>` : ''}
+
+            <!-- 表情包/梗图区 -->
+            <div class="meme-section">
+              <div class="meme-emoji">${u.emoji || '😶'}</div>
+              ${u.meme_desc ? `<div class="meme-desc">${u.meme_desc}</div>` : ''}
+            </div>
+
           </div>
         </div>
       </div>
@@ -1839,11 +1890,12 @@ function renderResult(data) {
 
   document.getElementById('universePanels').innerHTML = panelsHTML;
 
+  // 更新聊天历史（不再提及八字）
   state.chatHistory = [
-    { role: 'system', content: `你是「平行宇宙推演师」。用户${state.userName}（${state.userGender}，八字${state.bazi.full}${state.userOccupation ? '，' + state.userOccupation : ''}）刚刚完成了${state.userYears}年后的平行宇宙推演。你可以基于推演结果回答用户的问题。语气温暖神秘，适度提及八字概念。` },
-    { role: 'assistant', content: `你好${state.userName}！你的3个平行宇宙已经推演完成。关于这些推演结果，你有什么想深入了解的吗？比如某个维度的具体发展，或者想探索其他时间节点的可能性？` }
+    { role: 'system', content: `你是「平行宇宙推演师」。用户${state.userName}刚刚完成了平行宇宙推演，生成了多个平行宇宙版本（每个版本的人设、物种、性格都不同）。你可以基于推演结果回答用户的问题。语气要基于宇宙人设，真实不讨好，不要提及八字或命理概念。` },
+    { role: 'assistant', content: `推演完成！这次随机生成了 ${allUniverses.length} 个平行宇宙，我从中抽了3个给你看。关于这些宇宙中的「你」，你有什么想问的吗？` }
   ];
-  document.getElementById('chatMessages').innerHTML = '<div class="chat-msg ai">你好！关于你的平行宇宙，你有什么想深入了解的吗？可以问任何问题。</div>';
+  document.getElementById('chatMessages').innerHTML = '<div class="chat-msg ai">推演完成！你在上面可以看到3个随机抽选的平行宇宙，每个宇宙中的「你」都有不同的身份、性格和留言。有什么想深入了解的吗？</div>';
 
   setTimeout(() => {
     document.querySelectorAll('.dim-bar-fill').forEach(bar => {
@@ -1851,22 +1903,7 @@ function renderResult(data) {
       setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 100);
     });
   }, 300);
-}
-
-function switchUniverse(idx) {
-  const tabs = document.querySelectorAll('.universe-tab');
-  const classes = ['active-a', 'active-b', 'active-c'];
-  tabs.forEach((t, i) => {
-    t.classList.remove(...classes);
-    if (i === idx) t.classList.add(classes[i]);
-  });
-
-  document.querySelectorAll('.universe-panel').forEach((p, i) => {
-    p.classList.toggle('active', i === idx);
-  });
-}
-
-// ========== Chat ==========
+}// ========== Chat ==========
 function scrollToChat() {
   document.getElementById('chatSection').scrollIntoView({ behavior: 'smooth' });
   setTimeout(() => document.getElementById('chatInput').focus(), 500);
